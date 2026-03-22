@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Recruiter Call Prep — Prathap Gorantla</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #ffffff;
+    --surface: #f7f8fa;
+    --border: rgba(0,0,0,0.1);
+    --border-hover: rgba(0,0,0,0.25);
+    --text: #111;
+    --muted: #666;
+    --hint: #999;
+    --info-bg: #e8f1fd;
+    --info-text: #1a5cbf;
+    --info-border: #a8c4f0;
+    --success-bg: #eaf5ea;
+    --success-text: #1e7c34;
+    --success-border: #8dd49a;
+    --danger-bg: #fdecea;
+    --danger-text: #b91c1c;
+    --danger-border: #f5a5a5;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1a1a1a;
+      --surface: #242424;
+      --border: rgba(255,255,255,0.1);
+      --border-hover: rgba(255,255,255,0.28);
+      --text: #f0f0f0;
+      --muted: #aaa;
+      --hint: #666;
+      --info-bg: #0d2a50;
+      --info-text: #7ab4f5;
+      --info-border: #1e4a8a;
+      --success-bg: #0d2e14;
+      --success-text: #5abf6e;
+      --success-border: #1a5c2a;
+      --danger-bg: #2e0d0d;
+      --danger-text: #f87171;
+      --danger-border: #7f1d1d;
+    }
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 2rem 1.25rem;
+    max-width: 780px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+  h1 { font-size: 18px; font-weight: 500; margin-bottom: 4px; }
+  .subtitle { font-size: 13px; color: var(--muted); margin-bottom: 1.5rem; }
+  .top-bar { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: 1.25rem; }
+  .progress { font-size: 13px; color: var(--muted); }
+  .cat-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1.5rem; }
+  .cat-tab {
+    font-size: 12px; padding: 5px 13px; border-radius: 20px;
+    border: 0.5px solid var(--border); background: transparent;
+    color: var(--muted); cursor: pointer; transition: all .15s;
+  }
+  .cat-tab:hover { border-color: var(--border-hover); color: var(--text); }
+  .cat-tab.active {
+    background: var(--info-bg); color: var(--info-text);
+    border-color: var(--info-border); font-weight: 500;
+  }
+  .q-card {
+    background: var(--bg); border: 0.5px solid var(--border);
+    border-radius: 12px; padding: 1rem 1.25rem;
+    margin-bottom: 10px; cursor: pointer; transition: border-color .15s;
+  }
+  .q-card:hover { border-color: var(--border-hover); }
+  .q-card.open { border-color: var(--info-border); }
+  .q-header { display: flex; align-items: flex-start; gap: 10px; }
+  .q-num { font-size: 11px; font-weight: 500; color: var(--hint); min-width: 20px; padding-top: 2px; }
+  .q-text { font-size: 14px; font-weight: 500; color: var(--text); flex: 1; line-height: 1.5; }
+  .q-arrow { font-size: 11px; color: var(--hint); transition: transform .2s; padding-top: 3px; flex-shrink: 0; }
+  .q-card.open .q-arrow { transform: rotate(90deg); }
+  .q-body { display: none; margin-top: 14px; padding-top: 14px; border-top: 0.5px solid var(--border); }
+  .q-card.open .q-body { display: block; }
+  .answer-label { font-size: 11px; font-weight: 500; color: var(--info-text); letter-spacing: .06em; text-transform: uppercase; margin-bottom: 8px; }
+  .answer-text { font-size: 13px; color: var(--text); line-height: 1.75; }
+  .answer-text strong { font-weight: 500; }
+  .tip-box {
+    margin-top: 12px; background: var(--surface);
+    padding: 10px 14px; font-size: 12px; color: var(--muted);
+    line-height: 1.6; border-left: 2px solid var(--success-border); border-radius: 0;
+  }
+  .tip-box b { color: var(--success-text); font-weight: 500; }
+  .done-btn {
+    margin-top: 10px; font-size: 12px; padding: 4px 12px;
+    border-radius: 20px; border: 0.5px solid var(--border);
+    background: transparent; color: var(--hint); cursor: pointer; transition: all .15s;
+  }
+  .done-btn:hover { border-color: var(--border-hover); color: var(--text); }
+  .done-btn.marked { background: var(--success-bg); color: var(--success-text); border-color: var(--success-border); }
+  .badge {
+    display: inline-block; font-size: 11px; padding: 2px 8px;
+    border-radius: 20px; margin-left: 6px; vertical-align: middle;
+  }
+  .badge-hard { background: var(--danger-bg); color: var(--danger-text); }
+  .badge-cert { background: var(--success-bg); color: var(--success-text); }
+  .empty { font-size: 14px; color: var(--hint); padding: 2rem 0; text-align: center; }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <div>
+    <h1>Recruiter call prep</h1>
+    <div class="subtitle">Prathap Gorantla — Databricks Developer / Azure Data Engineer</div>
+  </div>
+  <span class="progress" id="prog">0 / 14 practiced</span>
+</div>
+
+<div class="cat-tabs" id="tabs"></div>
+<div id="qlist"></div>
+
+<script>
+const cats = ["All","Story & fit","Technical depth","Salary & logistics","Mindset & growth"];
+
+const qs = [
+  {
+    cat:"Story & fit",
+    q:"Tell me about yourself.",
+    answer:`"I'm a Data Engineer with about 2 years and 10 months of experience, currently at TCS in Hyderabad. My day-to-day is building production data pipelines on Azure Databricks — PySpark, Delta Lake, Azure Data Factory. I process roughly 45 to 50 GB of healthcare and pharmacy data per day using Medallion architecture. I'm Databricks certified at both Associate and Professional level, which I earned because I wanted to validate that I truly understand the platform, not just use it. I'm now looking for a role where I can go deeper — larger data volumes, more complex architectures, and ideally more ownership."`,
+    tip:`<b>Tip:</b> Keep this to 60–75 seconds. End with a forward-looking line — it tells the recruiter where you want to go, not just where you've been.`
+  },
+  {
+    cat:"Story & fit",
+    q:"Why are you looking for a new role right now?",
+    answer:`"I've grown a lot at TCS — I built pipelines from scratch, optimized them significantly, and earned both Databricks certifications. But I'm at a point where I want to work on larger-scale problems, ideally in a product company or a data-first environment where I have direct ownership of the data platform rather than working through layers of client delivery."`,
+    tip:`<b>Tip:</b> Never badmouth your current employer. Frame it as growth-seeking, not escape.`
+  },
+  {
+    cat:"Story & fit",
+    q:"Walk me through your current project.",
+    answer:`"At TCS I'm on a healthcare and pharmacy analytics engagement. I own the end-to-end data pipeline from raw ingestion to Gold-layer tables that feed BI dashboards. The architecture is Medallion — Bronze for raw ADLS landing, Silver for cleaned and conformed data, Gold for business-ready aggregates. We process around 45 to 50 GB per day in batch. I've optimized the Spark jobs significantly — brought runtimes down 40 to 45 percent using partitioning, caching, and file compaction. On the Delta Lake side I handle MERGE operations, schema evolution, and I run OPTIMIZE and Z-ORDER regularly to keep query performance healthy."`,
+    tip:`<b>Tip:</b> Numbers make this real. Volume (45–50 GB), improvement (40–45%) and specific techniques show you're not reading from a script.`
+  },
+  {
+    cat:"Story & fit",
+    q:"What's your biggest technical achievement so far?",
+    answer:`"The pipeline optimization work. When I joined the project the Spark jobs were running long and there was a lot of full-reload processing. I profiled the bottlenecks, introduced dynamic partitioning, added caching for reused DataFrames, and compacted small files that were killing read performance. The result was a 40 to 45 percent reduction in runtime. It was meaningful because it didn't just make the jobs faster — it reduced infrastructure cost and improved our data availability window for the BI team."`,
+    tip:`<b>Tip:</b> Frame achievements as: problem → your action → measurable result. This is the structure interviewers remember.`
+  },
+  {
+    cat:"Technical depth",
+    q:"What Azure and Databricks tools do you use daily?",
+    answer:`"Day to day: Databricks for compute and notebook-based pipeline development, PySpark for distributed transformations, Delta Lake for the storage layer, ADLS Gen2 for raw and processed data storage, and Azure Data Factory for orchestration and triggering pipelines. Git for version control across the team. I use SQL heavily inside Databricks for the Gold-layer aggregations."`,
+    tip:`<b>Tip:</b> Recruiters copy-paste your answer into a skills checklist. List tools clearly and confidently — don't bury them.`,
+    hard: true
+  },
+  {
+    cat:"Technical depth",
+    q:"Can you explain Medallion architecture in plain terms?",
+    answer:`"It's a layered approach to organizing data in a lakehouse. Bronze is the raw landing zone — data arrives exactly as the source sent it, no transformations, just durability. Silver is where you clean, validate, join, and conform the data — it's the trusted, queryable layer. Gold is business-level aggregates and domain models that BI tools and analysts consume directly. The big benefit is clear lineage, easy debugging — if something's wrong in Gold you trace it back through Silver to Bronze — and separating storage concerns from compute."`,
+    tip:`<b>Tip:</b> Recruiters ask this to verify you've actually worked with it. Keep it concise. If they want more depth, they'll ask.`,
+    hard: true
+  },
+  {
+    cat:"Technical depth",
+    q:"What is Delta Lake and why does it matter?",
+    answer:`"Delta Lake is an open-source storage layer that brings ACID transactions to your data lake. Without it, a data lake is just files — no guarantees around consistency if a write fails halfway. With Delta Lake you get reliable MERGE and upsert operations, schema enforcement, schema evolution when your source data changes, and Time Travel which lets you query historical versions of a table. In practice it means I can build incremental pipelines that are safe to rerun without duplicating data, which is critical in healthcare where data accuracy matters."`,
+    hard: true,
+    tip:`<b>Tip:</b> Mentioning healthcare context shows you connect technology to business requirements — that stands out.`
+  },
+  {
+    cat:"Technical depth",
+    q:"How do you handle incremental data loads?",
+    answer:`"I use Delta Lake MERGE statements combined with a watermark pattern. Typically I track a high-water mark column — like a last_modified timestamp — to pull only changed or new records from the source. Then I MERGE them into the target Delta table: update if the key exists, insert if it's new. For some tables I also use CDC patterns depending on what the source system supports. The goal is always to avoid full reloads — at 45 to 50 GB per day, full reloads aren't cost-effective or time-efficient."`,
+    hard: true,
+    tip:`<b>Tip:</b> Recruiters for senior roles will probe this further. Know MERGE syntax cold.`
+  },
+  {
+    cat:"Technical depth",
+    q:"How did you optimize Spark job performance?",
+    answer:`"A few different levers. First, partitioning — partitioning data by a high-cardinality date or region column reduces the shuffle and limits how much each task reads. Second, caching — any DataFrame that gets reused in the same pipeline I persist to memory rather than recomputing it. Third, file compaction — small files are a major Spark performance killer, so I run OPTIMIZE on Delta tables regularly to consolidate them. Z-ORDER on top of that clusters physically related data to cut read I/O. Combined, these brought our job runtimes down 40 to 45 percent."`,
+    hard: true,
+    tip:`<b>Tip:</b> Structure this as a list of techniques. It shows systematic thinking, not luck.`
+  },
+  {
+    cat:"Salary & logistics",
+    q:"What's your current CTC and what are your expectations?",
+    answer:`Research the market rate before the call. For a Databricks / Azure Data Engineer with 2–3 years in Hyderabad, the range in 2025–2026 is roughly ₹8–14 LPA depending on company size. Give a range, not a single number. Example: "I'm currently at X. Based on my research and the scope of this role, I'm targeting somewhere in the Y to Z range — but I'm open to discussing the full compensation picture."`,
+    tip:`<b>Tip:</b> Never anchor too low. If they ask for current CTC first, it's okay to say "I'd prefer to share expectations based on the role scope" in a product company context.`
+  },
+  {
+    cat:"Salary & logistics",
+    q:"What's your notice period?",
+    answer:`"My official notice period is [your actual period — typically 60–90 days at TCS]. I'd want to ensure a proper handover of my pipelines, but I'm open to discussing early joining if the situation allows."`,
+    tip:`<b>Tip:</b> Don't promise to negotiate your notice period before you have an offer. Keep it factual now, negotiate later.`
+  },
+  {
+    cat:"Salary & logistics",
+    q:"Are you open to relocation / hybrid / remote?",
+    answer:`Answer honestly based on your actual preference. Just be specific — "I'm open to hybrid in Hyderabad or Bangalore" is more useful to a recruiter than "I'm flexible."`,
+    tip:`<b>Tip:</b> Recruiters are filtering for logistics. Ambiguity wastes both sides' time.`
+  },
+  {
+    cat:"Mindset & growth",
+    q:"You have under 3 years of experience — how do you position yourself for senior roles?",
+    answer:`"I'd position it differently — I have under 3 years of time, but I have production experience at scale. I've optimized pipelines processing 45 to 50 GB per day, designed full Medallion architectures, and I hold both Databricks certifications — Associate and Professional. The Professional certification in particular is not a beginner credential. I'm not claiming to have a decade of architecture experience, but I'm technically deeper than my tenure suggests."`,
+    tip:`<b>Tip:</b> This question will come up. Have this answer ready. Own your certifications — dual Databricks certification at your experience level is genuinely rare.`,
+    cert: true
+  },
+  {
+    cat:"Mindset & growth",
+    q:"What are you looking to learn or work on next?",
+    answer:`"I want to go deeper on real-time streaming — I've only worked in batch so far and I want to get hands-on with Spark Structured Streaming or Delta Live Tables. I'm also interested in data quality frameworks and working closer to the platform side — infrastructure-as-code, cluster tuning at a deeper level. And eventually data architecture ownership — not just building pipelines but designing the systems they run on."`,
+    tip:`<b>Tip:</b> Be specific. "I want to grow" means nothing. Naming technologies like DLT or Structured Streaming shows you've thought about your roadmap.`
+  }
+];
+
+let active = "All";
+let marked = new Set();
+
+function render() {
+  const tabsEl = document.getElementById('tabs');
+  tabsEl.innerHTML = cats.map(c =>
+    `<button class="cat-tab${c===active?' active':''}" onclick="setcat('${c}')">${c}</button>`
+  ).join('');
+
+  const filtered = active==="All" ? qs : qs.filter(q=>q.cat===active);
+  const el = document.getElementById('qlist');
+  if (!filtered.length) { el.innerHTML = '<div class="empty">No questions in this category.</div>'; return; }
+  el.innerHTML = filtered.map((q,i) => {
+    const idx = qs.indexOf(q);
+    const isDone = marked.has(idx);
+    const badges = (q.hard ? `<span class="badge badge-hard">technical</span>` : '') +
+                   (q.cert ? `<span class="badge badge-cert">use your cert</span>` : '');
+    return `<div class="q-card" id="qc${idx}" onclick="toggle(${idx})">
+      <div class="q-header">
+        <span class="q-num">${i+1}</span>
+        <span class="q-text">${q.q}${badges}</span>
+        <span class="q-arrow">&#9658;</span>
+      </div>
+      <div class="q-body">
+        <div class="answer-label">Sample answer</div>
+        <div class="answer-text">${q.answer}</div>
+        <div class="tip-box">${q.tip}</div>
+        <div style="margin-top:10px;">
+          <button class="done-btn${isDone?' marked':''}" onclick="event.stopPropagation();markDone(${idx})">${isDone?'✓ Practiced':'Mark as practiced'}</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('prog').textContent = `${marked.size} / ${qs.length} practiced`;
+}
+
+function setcat(c) { active=c; render(); }
+
+function toggle(idx) {
+  document.getElementById('qc'+idx).classList.toggle('open');
+}
+
+function markDone(idx) {
+  if (marked.has(idx)) marked.delete(idx); else marked.add(idx);
+  render();
+  const card = document.getElementById('qc'+idx);
+  if (card) card.classList.add('open');
+}
+
+render();
+</script>
+</body>
+</html>
