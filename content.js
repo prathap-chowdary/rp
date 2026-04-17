@@ -1,54 +1,30 @@
 const cats = ["All","Story & fit","Technical depth","Salary & logistics","Mindset & growth"];
 const qs = [
-  {
+{
     cat:"Story & fit",
     q:"Tell me about yourself.",
-   answer:`Sure ! Thanks for giving this opportunity. I’m Prathap, working as an Azure Data Engineer at TCS with around 3 years of experience in building and optimizing enterprise data pipelines. My core stack includes Azure Databricks, ADF, PySpark, Python, and SQL. I’ve been working on a US-based healthcare client project. I completed my B.Tech in Electronics and Communication Engineering from VR Siddhartha Engineering College, Vijayawada.
+     answer:`Sure ! Thanks for giving this opportunity. I’m Prathap, working as an Azure Data Engineer at TCS with around 3 years of experience in building and optimizing enterprise data pipelines. My core stack includes Azure Databricks, ADF, PySpark, Python, and SQL. I’ve been working on a US-based healthcare client project. I completed my B.Tech in Electronics and Communication Engineering from VR Siddhartha Engineering College, Vijayawada.
     I also hold both the Databricks Certified Data Engineer Associate and Professional certifications`,
-    children:[
-      {
-        q:"Why ECE to Data Engineering?",
-        a:"Shifted interest to software during college.",
-        children:[
-          {
-            q:"Why not core ECE job?",
-            a:"Better growth and interest in data systems.",
-            children:[]
-          }
-        ]
-      },
-      {
-        q:"What are your strengths?",
-        a:"PySpark optimization, SQL.",
-        children:[]
-      }
-    ]
-  },
-  {
-    cat:"Technical depth",
-    q:"What is data skew?",
-    answer:"Uneven data distribution causing slow tasks.",
-    children:[
-      {
-        q:"How to detect?",
-        a:"One partition taking longer.",
-        children:[
-          {
-            q:"Metric?",
-            a:"Compare task duration vs median.",
-            children:[]
-          }
-        ]
-      }
-    ]
-  }
-
-
-
-
-
-  
-  {
+              children:[
+              {
+                q:"Why ECE to Data Engineering?",
+                a:"Shifted interest to software during college.",
+                children:[
+                  {
+                    q:"Why not core ECE job?",
+                    a:"Better growth and interest in data systems.",
+                    children:[]
+                  }
+                ]
+              },
+              {
+                q:"What are your strengths?",
+                a:"PySpark optimization, SQL.",
+                children:[]
+              }
+            ]
+},
+ {
     cat:"Story & fit",
     q:"Why are you looking for a new role right now? / leaving TCS",
     answer:`"👉TCS gave me a strong foundation in building production-grade data pipelines on Azure Databricks and understanding how large-scale healthcare data systems operate end to end.
