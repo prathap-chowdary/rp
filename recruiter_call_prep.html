@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Recruiter Call Prep — Prathap Gorantla</title>
 <link rel="stylesheet" href="c.css">
+  <script src="s.js"></script>
 </head>
 <body>
 
@@ -19,7 +20,7 @@
 <div id="qlist"></div>
 
 <script>
-const cats = ["All","Story & fit","Technical depth","Salary & logistics","Mindset & growth"];
+
 
 const qs = [
   {
@@ -157,57 +158,6 @@ Overall, this system ensures scalable, reliable, and hgh availability for critic
     tip:`<b>Tip:</b> Be specific. "I want to grow" means nothing. Naming technologies like DLT or Structured Streaming shows you've thought about your roadmap.`
   }
 ];
-
-let active = "All";
-let marked = new Set();
-
-function render() {
-  const tabsEl = document.getElementById('tabs');
-  tabsEl.innerHTML = cats.map(c =>
-    `<button class="cat-tab${c===active?' active':''}" onclick="setcat('${c}')">${c}</button>`
-  ).join('');
-
-  const filtered = active==="All" ? qs : qs.filter(q=>q.cat===active);
-  const el = document.getElementById('qlist');
-  if (!filtered.length) { el.innerHTML = '<div class="empty">No questions in this category.</div>'; return; }
-  el.innerHTML = filtered.map((q,i) => {
-    const idx = qs.indexOf(q);
-    const isDone = marked.has(idx);
-    const badges = (q.hard ? `<span class="badge badge-hard">technical</span>` : '') +
-                   (q.cert ? `<span class="badge badge-cert">use your cert</span>` : '');
-    return `<div class="q-card" id="qc${idx}" onclick="toggle(${idx})">
-      <div class="q-header">
-        <span class="q-num">${i+1}</span>
-        <span class="q-text">${q.q}${badges}</span>
-        <span class="q-arrow">&#9658;</span>
-      </div>
-      <div class="q-body">
-        <div class="answer-label">Sample answer</div>
-        <div class="answer-text">${q.answer}</div>
-        <div class="tip-box">${q.tip}</div>
-        <div style="margin-top:10px;">
-          <button class="done-btn${isDone?' marked':''}" onclick="event.stopPropagation();markDone(${idx})">${isDone?'✓ Practiced':'Mark as practiced'}</button>
-        </div>
-      </div>
-    </div>`;
-  }).join('');
-  document.getElementById('prog').textContent = `${marked.size} / ${qs.length} practiced`;
-}
-
-function setcat(c) { active=c; render(); }
-
-function toggle(idx) {
-  document.getElementById('qc'+idx).classList.toggle('open');
-}
-
-function markDone(idx) {
-  if (marked.has(idx)) marked.delete(idx); else marked.add(idx);
-  render();
-  const card = document.getElementById('qc'+idx);
-  if (card) card.classList.add('open');
-}
-
-render();
 </script>
 </body>
 </html>
