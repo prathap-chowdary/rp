@@ -3,20 +3,19 @@ const qs = [
   {
     cat:"Story & fit",
     q:"Tell me about yourself.",
-    answer:`Sure ! Thanks for giving this opportunity. I’m Prathap, working as an Azure Data Engineer at TCS with around 3 years of experience in building and optimizing enterprise data pipelines. My core stack includes Azure Databricks, ADF, PySpark, Python, and SQL. I’ve been working on a US-based healthcare client project. I completed my B.Tech in Electronics and Communication Engineering from VR Siddhartha Engineering College, Vijayawada.
-    I also hold both the Databricks Certified Data Engineer Associate and Professional certifications..`,
-   children:[
+   answer:`Sure ! Thanks for giving this opportunity. I’m Prathap, working as an Azure Data Engineer at TCS with around 3 years of experience in building and optimizing enterprise data pipelines. My core stack includes Azure Databricks, ADF, PySpark, Python, and SQL. I’ve been working on a US-based healthcare client project. I completed my B.Tech in Electronics and Communication Engineering from VR Siddhartha Engineering College, Vijayawada.
+    I also hold both the Databricks Certified Data Engineer Associate and Professional certifications`,
+    children:[
       {
         q:"Why ECE to Data Engineering?",
-        a:`Although I studied ECE, I developed a strong interest in data and software during my college and started learning Python and SQL. 
-          That interest turned into hands-on experience in my current role with Databricks and PySpark, so I chose to build my career in data engineering.`,
-            children:[
-                {
-                  q:"Why not core ECE job?",
-                  a:"Better growth and interest in data systems.",
-                      children:[]
-                }
-              ]
+        a:"Shifted interest to software during college.",
+        children:[
+          {
+            q:"Why not core ECE job?",
+            a:"Better growth and interest in data systems.",
+            children:[]
+          }
+        ]
       },
       {
         q:"What are your strengths?",
@@ -25,6 +24,24 @@ const qs = [
       }
     ]
   },
+  {
+    cat:"Technical depth",
+    q:"What is data skew?",
+    answer:"Uneven data distribution causing slow tasks.",
+    children:[
+      {
+        q:"How to detect?",
+        a:"One partition taking longer.",
+        children:[
+          {
+            q:"Metric?",
+            a:"Compare task duration vs median.",
+            children:[]
+          }
+        ]
+      }
+    ]
+  }
 
 
 
@@ -38,7 +55,7 @@ const qs = [
     👉 Most of the systems I worked on were already designed when I joined, so my role was primarily focused on enhancing and optimizing existing pipelines rather than contributing to architectural decisions.
     👉 Within that scope, I worked on performance improvements—for example, I reduced pipeline runtime by around 40–45% by addressing small file issues, improving partitioning, and optimizing joins.
     👉 Now I’m looking for a role where I can go beyond optimization—take ownership of end-to-end pipeline design, work on more complex scalability challenges, and contribute to architecture decisions."`,
-    tip:`<b>Tip:</b> Never badmouth your current employer. Frame it as growth-seeking, not escape.`
+  
   },
   {
     cat:"Story & fit",
@@ -60,78 +77,66 @@ The pipelines are orchestrated using scheduled workflows running every 4 hours.
 One key contribution I made was improving incremental load efficiency and strengthening data validation checks, which helped reduce data inconsistencies and improved overall pipeline reliability.
 
 Overall, this system ensures scalable, reliable, and hgh availability for critical healthcare analytics.”"`,
-    tip:`<b>Tip:</b> Numbers make this real. Volume (45–50 GB), improvement (40–45%) and specific techniques show you're not reading from a script.`
   },
   {
     cat:"Story & fit",
     q:"What's your biggest technical achievement so far?",
     answer:`"The pipeline optimization work. When I joined the project the Spark jobs were running long and there was a lot of full-reload processing. I profiled the bottlenecks, introduced dynamic partitioning, added caching for reused DataFrames, and compacted small files that were killing read performance. The result was a 40 to 45 percent reduction in runtime. It was meaningful because it didn't just make the jobs faster — it reduced infrastructure cost and improved our data availability window for the BI team."`,
-    tip:`<b>Tip:</b> Frame achievements as: problem → your action → measurable result. This is the structure interviewers remember.`
   },
   {
     cat:"Technical depth",
     q:"What Azure and Databricks tools do you use daily?",
     answer:`"Day to day: Databricks for compute and notebook-based pipeline development, PySpark for distributed transformations, Delta Lake for the storage layer, ADLS Gen2 for raw and processed data storage, and Azure Data Factory for orchestration and triggering pipelines. Git for version control across the team. I use SQL heavily inside Databricks for the Gold-layer aggregations."`,
-    tip:`<b>Tip:</b> Recruiters copy-paste your answer into a skills checklist. List tools clearly and confidently — don't bury them.`,
-    hard: true
+ 
   },
   {
     cat:"Technical depth",
     q:"Can you explain Medallion architecture in plain terms?",
     answer:`"It's a layered approach to organizing data in a lakehouse. Bronze is the raw landing zone — data arrives exactly as the source sent it, no transformations, just durability. Silver is where you clean, validate, join, and conform the data — it's the trusted, queryable layer. Gold is business-level aggregates and domain models that BI tools and analysts consume directly. The big benefit is clear lineage, easy debugging — if something's wrong in Gold you trace it back through Silver to Bronze — and separating storage concerns from compute."`,
-    tip:`<b>Tip:</b> Recruiters ask this to verify you've actually worked with it. Keep it concise. If they want more depth, they'll ask.`,
-    hard: true
+   
   },
   {
     cat:"Technical depth",
     q:"What is Delta Lake and why does it matter?",
     answer:`"Delta Lake is an open-source storage layer that brings ACID transactions to your data lake. Without it, a data lake is just files — no guarantees around consistency if a write fails halfway. With Delta Lake you get reliable MERGE and upsert operations, schema enforcement, schema evolution when your source data changes, and Time Travel which lets you query historical versions of a table. In practice it means I can build incremental pipelines that are safe to rerun without duplicating data, which is critical in healthcare where data accuracy matters."`,
-    hard: true,
-    tip:`<b>Tip:</b> Mentioning healthcare context shows you connect technology to business requirements — that stands out.`
+  
   },
   {
     cat:"Technical depth",
     q:"How do you handle incremental data loads?",
     answer:`"I use Delta Lake MERGE statements combined with a watermark pattern. Typically I track a high-water mark column — like a last_modified timestamp — to pull only changed or new records from the source. Then I MERGE them into the target Delta table: update if the key exists, insert if it's new. For some tables I also use CDC patterns depending on what the source system supports. The goal is always to avoid full reloads — at 45 to 50 GB per day, full reloads aren't cost-effective or time-efficient."`,
-    hard: true,
-    tip:`<b>Tip:</b> Recruiters for senior roles will probe this further. Know MERGE syntax cold.`
+
   },
   {
     cat:"Technical depth",
     q:"How did you optimize Spark job performance?",
     answer:`"A few different levers. First, partitioning — partitioning data by a high-cardinality date or region column reduces the shuffle and limits how much each task reads. Second, caching — any DataFrame that gets reused in the same pipeline I persist to memory rather than recomputing it. Third, file compaction — small files are a major Spark performance killer, so I run OPTIMIZE on Delta tables regularly to consolidate them. Z-ORDER on top of that clusters physically related data to cut read I/O. Combined, these brought our job runtimes down 40 to 45 percent."`,
-    hard: true,
-    tip:`<b>Tip:</b> Structure this as a list of techniques. It shows systematic thinking, not luck.`
+
   },
   {
     cat:"Salary & logistics",
     q:"What's your current CTC and what are your expectations?",
     answer:`Research the market rate before the call. For a Databricks / Azure Data Engineer with 2–3 years in Hyderabad, the range in 2025–2026 is roughly ₹8–14 LPA depending on company size. Give a range, not a single number. Example: "I'm currently at X. Based on my research and the scope of this role, I'm targeting somewhere in the Y to Z range — but I'm open to discussing the full compensation picture."`,
-    tip:`<b>Tip:</b> Never anchor too low. If they ask for current CTC first, it's okay to say "I'd prefer to share expectations based on the role scope" in a product company context.`
   },
   {
     cat:"Salary & logistics",
     q:"What's your notice period?",
     answer:`"My official notice period is [your actual period — typically 60–90 days at TCS]. I'd want to ensure a proper handover of my pipelines, but I'm open to discussing early joining if the situation allows."`,
-    tip:`<b>Tip:</b> Don't promise to negotiate your notice period before you have an offer. Keep it factual now, negotiate later.`
   },
   {
     cat:"Salary & logistics",
     q:"Are you open to relocation / hybrid / remote?",
     answer:`Answer honestly based on your actual preference. Just be specific — "I'm open to hybrid in Hyderabad or Bangalore" is more useful to a recruiter than "I'm flexible."`,
-    tip:`<b>Tip:</b> Recruiters are filtering for logistics. Ambiguity wastes both sides' time.`
   },
   {
     cat:"Mindset & growth",
     q:"You have under 3 years of experience — how do you position yourself for senior roles?",
     answer:`"I'd position it differently — I have under 3 years of time, but I have production experience at scale. I've optimized pipelines processing 45 to 50 GB per day, designed full Medallion architectures, and I hold both Databricks certifications — Associate and Professional. The Professional certification in particular is not a beginner credential. I'm not claiming to have a decade of architecture experience, but I'm technically deeper than my tenure suggests."`,
-    tip:`<b>Tip:</b> This question will come up. Have this answer ready. Own your certifications — dual Databricks certification at your experience level is genuinely rare.`,
-    cert: true
+ 
   },
   {
     cat:"Mindset & growth",
     q:"What are you looking to learn or work on next?",
     answer:`"I want to go deeper on real-time streaming — I've only worked in batch so far and I want to get hands-on with Spark Structured Streaming or Delta Live Tables. I'm also interested in data quality frameworks and working closer to the platform side — infrastructure-as-code, cluster tuning at a deeper level. And eventually data architecture ownership — not just building pipelines but designing the systems they run on."`,
-    tip:`<b>Tip:</b> Be specific. "I want to grow" means nothing. Naming technologies like DLT or Structured Streaming shows you've thought about your roadmap.`
   }
 ];
