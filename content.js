@@ -1,3 +1,4 @@
+const cats = ["All","Story & fit","Technical depth","Salary & logistics","Mindset & growth"];
 const qs = [
   {
     cat:"Story & fit",
