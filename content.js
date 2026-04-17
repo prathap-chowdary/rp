@@ -31,6 +31,7 @@ const qs = [
     👉 Most of the systems I worked on were already designed when I joined, so my role was primarily focused on enhancing and optimizing existing pipelines rather than contributing to architectural decisions.
     👉 Within that scope, I worked on performance improvements—for example, I reduced pipeline runtime by around 40–45% by addressing small file issues, improving partitioning, and optimizing joins.
     👉 Now I’m looking for a role where I can go beyond optimization—take ownership of end-to-end pipeline design, work on more complex scalability challenges, and contribute to architecture decisions."`,
+children:[]
   
   },
   {
@@ -53,66 +54,73 @@ The pipelines are orchestrated using scheduled workflows running every 4 hours.
 One key contribution I made was improving incremental load efficiency and strengthening data validation checks, which helped reduce data inconsistencies and improved overall pipeline reliability.
 
 Overall, this system ensures scalable, reliable, and hgh availability for critical healthcare analytics.”"`,
+children:[]
   },
   {
     cat:"Story & fit",
     q:"What's your biggest technical achievement so far?",
-    answer:`"The pipeline optimization work. When I joined the project the Spark jobs were running long and there was a lot of full-reload processing. I profiled the bottlenecks, introduced dynamic partitioning, added caching for reused DataFrames, and compacted small files that were killing read performance. The result was a 40 to 45 percent reduction in runtime. It was meaningful because it didn't just make the jobs faster — it reduced infrastructure cost and improved our data availability window for the BI team."`,
+    answer:`"The pipeline optimization work. When I joined the project the Spark jobs were running long and there was a lot of full-reload processing. I profiled the bottlenecks, introduced dynamic partitioning, added caching for reused DataFrames, and compacted small files that were killing read performance. The result was a 40 to 45 percent reduction in runtime. It was meaningful because it didn't just make the jobs faster — it reduced infrastructure cost and improved our data availability window for the BI team."`,children:[]
   },
   {
     cat:"Technical depth",
     q:"What Azure and Databricks tools do you use daily?",
-    answer:`"Day to day: Databricks for compute and notebook-based pipeline development, PySpark for distributed transformations, Delta Lake for the storage layer, ADLS Gen2 for raw and processed data storage, and Azure Data Factory for orchestration and triggering pipelines. Git for version control across the team. I use SQL heavily inside Databricks for the Gold-layer aggregations."`,
+    answer:`"Day to day: Databricks for compute and notebook-based pipeline development, PySpark for distributed transformations, Delta Lake for the storage layer, ADLS Gen2 for raw and processed data storage, and Azure Data Factory for orchestration and triggering pipelines. Git for version control across the team. I use SQL heavily inside Databricks for the Gold-layer aggregations."`,children:[]
  
   },
   {
     cat:"Technical depth",
     q:"Can you explain Medallion architecture in plain terms?",
     answer:`"It's a layered approach to organizing data in a lakehouse. Bronze is the raw landing zone — data arrives exactly as the source sent it, no transformations, just durability. Silver is where you clean, validate, join, and conform the data — it's the trusted, queryable layer. Gold is business-level aggregates and domain models that BI tools and analysts consume directly. The big benefit is clear lineage, easy debugging — if something's wrong in Gold you trace it back through Silver to Bronze — and separating storage concerns from compute."`,
-   
+ children:[]  
   },
   {
     cat:"Technical depth",
     q:"What is Delta Lake and why does it matter?",
     answer:`"Delta Lake is an open-source storage layer that brings ACID transactions to your data lake. Without it, a data lake is just files — no guarantees around consistency if a write fails halfway. With Delta Lake you get reliable MERGE and upsert operations, schema enforcement, schema evolution when your source data changes, and Time Travel which lets you query historical versions of a table. In practice it means I can build incremental pipelines that are safe to rerun without duplicating data, which is critical in healthcare where data accuracy matters."`,
+ children:[]  
   
   },
   {
     cat:"Technical depth",
     q:"How do you handle incremental data loads?",
     answer:`"I use Delta Lake MERGE statements combined with a watermark pattern. Typically I track a high-water mark column — like a last_modified timestamp — to pull only changed or new records from the source. Then I MERGE them into the target Delta table: update if the key exists, insert if it's new. For some tables I also use CDC patterns depending on what the source system supports. The goal is always to avoid full reloads — at 45 to 50 GB per day, full reloads aren't cost-effective or time-efficient."`,
-
+ children:[]  
   },
   {
     cat:"Technical depth",
     q:"How did you optimize Spark job performance?",
     answer:`"A few different levers. First, partitioning — partitioning data by a high-cardinality date or region column reduces the shuffle and limits how much each task reads. Second, caching — any DataFrame that gets reused in the same pipeline I persist to memory rather than recomputing it. Third, file compaction — small files are a major Spark performance killer, so I run OPTIMIZE on Delta tables regularly to consolidate them. Z-ORDER on top of that clusters physically related data to cut read I/O. Combined, these brought our job runtimes down 40 to 45 percent."`,
-
+ children:[]  
   },
   {
     cat:"Salary & logistics",
     q:"What's your current CTC and what are your expectations?",
     answer:`Research the market rate before the call. For a Databricks / Azure Data Engineer with 2–3 years in Hyderabad, the range in 2025–2026 is roughly ₹8–14 LPA depending on company size. Give a range, not a single number. Example: "I'm currently at X. Based on my research and the scope of this role, I'm targeting somewhere in the Y to Z range — but I'm open to discussing the full compensation picture."`,
+ children:[]  
   },
   {
     cat:"Salary & logistics",
     q:"What's your notice period?",
     answer:`"My official notice period is [your actual period — typically 60–90 days at TCS]. I'd want to ensure a proper handover of my pipelines, but I'm open to discussing early joining if the situation allows."`,
+ children:[]  
   },
   {
     cat:"Salary & logistics",
     q:"Are you open to relocation / hybrid / remote?",
     answer:`Answer honestly based on your actual preference. Just be specific — "I'm open to hybrid in Hyderabad or Bangalore" is more useful to a recruiter than "I'm flexible."`,
+ children:[]  
   },
   {
     cat:"Mindset & growth",
     q:"You have under 3 years of experience — how do you position yourself for senior roles?",
     answer:`"I'd position it differently — I have under 3 years of time, but I have production experience at scale. I've optimized pipelines processing 45 to 50 GB per day, designed full Medallion architectures, and I hold both Databricks certifications — Associate and Professional. The Professional certification in particular is not a beginner credential. I'm not claiming to have a decade of architecture experience, but I'm technically deeper than my tenure suggests."`,
+ children:[]  
  
   },
   {
     cat:"Mindset & growth",
     q:"What are you looking to learn or work on next?",
     answer:`"I want to go deeper on real-time streaming — I've only worked in batch so far and I want to get hands-on with Spark Structured Streaming or Delta Live Tables. I'm also interested in data quality frameworks and working closer to the platform side — infrastructure-as-code, cluster tuning at a deeper level. And eventually data architecture ownership — not just building pipelines but designing the systems they run on."`,
+ children:[]  
   }
 ];
