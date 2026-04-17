@@ -1,4 +1,4 @@
-const cats = ["All","Story & fit","Technical depth","Salary & logistics","Mindset & growth"];
+
 let active = "All";
  
 function renderNodes(nodes, path) {
