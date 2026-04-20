@@ -23,15 +23,26 @@ const qs = [
 children:[
     {
         q:"what optimizations",
-        a:"👉 Within my scope, I worked on optimizations —for example, I reduced pipeline runtime by around 30–35%(30 mins- 20 mins) by addressing small file issues, improving partitioning, and optimizing joins.",
+        a:"👉 In our pipelines, I mainly worked on reducing job runtime . For example, one of our joins between large claim tables was causing heavy shuffle. I optimized it using broadcast join for smaller dimension tables and repartitioned data based on join keys. This reduced runtime by around 30–40%.",
        children: [
                        {
-                            q:`how you identifiedbottle necks`
-                            a:``,
+                            q:`how you identifiedbottle necks`,
+                            a:`“I identified the bottleneck using Spark UI — stages with high shuffle read and skewed tasks."`,
                             children:[]
                        },
                ],
     } ,
+    {
+        q:`what design decisions are you ref to`,
+        a:`👉“Primarily around structuring pipelines — deciding how to split transformations across bronze, silver, and gold, choosing incremental vs full loads, and partitioning strategies for large tables.”
+            👉 If pushed:“For example, for frequently updated healthcare claims data, we used incremental loads with merge instead of full refresh to reduce processing time.”`,
+        children:[],
+    },
+    {
+        q:`what makes systems scabale`,
+        a:`Scalability depends on handling increasing data without performance degradation. In our case, we ensured scalability using partitioning on high-cardinality columns, incremental processing instead of full loads, and avoiding data skew during joins.`,
+        children:[],
+    },
     {
         q:`How do you ensure data quality?`,
         a:`In silver layer, we apply checks like removing duplicates, handling null values, and validating schema. We also compare record counts between source and target. For critical tables, we added validation queries to ensure consistency before loading into gold.`,
