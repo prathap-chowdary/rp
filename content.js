@@ -8,32 +8,59 @@ const qs = [
               children:[
               {
                 q:"Why ECE to Data Engineering?",
-                a:"Shifted interest to software during college.",
-                children:[
-                  {
-                    q:"Why not core ECE job?",
-                    a:"Better growth and interest in data systems.",
-                    children:[]
-                  }
-                ]
-              },
-              {
-                q:"What are your strengths?",
-                a:"PySpark optimization, SQL.",
+                a:"Although I studied ECE, I developed a strong interest in data and software during my college and started learning Python and SQL. That interest turned into hands-on experience in my current role with Databricks and PySpark, so I chose to build my career in data engineering",
                 children:[]
-              }
+              },
             ]
 },
+//new
  {
     cat:"Story & fit",
     q:"Why are you looking for a new role right now? / leaving TCS",
     answer:`"👉TCS gave me a strong foundation in building production-grade data pipelines on Azure Databricks and understanding how large-scale healthcare data systems operate end to end.
-    👉 Most of the systems I worked on were already designed when I joined, so my role was primarily focused on enhancing and optimizing existing pipelines rather than contributing to architectural decisions.
-    👉 Within that scope, I worked on performance improvements—for example, I reduced pipeline runtime by around 40–45% by addressing small file issues, improving partitioning, and optimizing joins.
-    👉 Now I’m looking for a role where I can go beyond optimization—take ownership of end-to-end pipeline design, work on more complex scalability challenges, and contribute to architecture decisions."`,
-children:[]
-  
-  },
+    👉 My role has mainly focused on enhancing & optimizing existing systems, and I’m now looking for opportunities where I can contribute more to design decisions and grow in building scalable data systems`
+    ,
+children:[
+    {
+        q:"what optimizations",
+        a:"👉 Within my scope, I worked on optimizations —for example, I reduced pipeline runtime by around 30–35%(30 mins- 20 mins) by addressing small file issues, improving partitioning, and optimizing joins.",
+       children: [
+                       {
+                            q:`how you identifiedbottle necks`
+                            a:``,
+                            children:[]
+                       },
+               ],
+    } ,
+    {
+        q:`How do you ensure data quality?`,
+        a:`In silver layer, we apply checks like removing duplicates, handling null values, and validating schema. We also compare record counts between source and target. For critical tables, we added validation queries to ensure consistency before loading into gold.`,
+        children:[],
+    },
+    {
+        q:`Handling large data volumes?`,
+        a:`For large datasets, we use partitioning and avoid small file issues by optimizing file sizes. We also use Delta format for efficient reads and writes. During joins, we handle skew using repartitioning or broadcast where applicable`,
+        children:[],
+    },
+    {
+        q:`how do you handle failures`,
+        a:`“We use retry mechanisms in our job orchestration. Also, since we use incremental loads with merge, pipelines are idempotent — rerunning doesn’t create duplicates. We also log failures and track them for debugging.”`,
+        children:[],
+    },
+    {
+        q:`How do you optimize cost in Databricks?`,
+        a:`We optimized cost by using job clusters instead of all-purpose clusters, enabling auto-scaling, and avoiding unnecessary full data processing. Also, by optimizing queries and reducing shuffle, we reduced compute usage.`,
+        children:[],
+    },
+    {
+        q:`How do you ensure data quality?`,
+        a:`yes`,
+        children:[],
+    }
+   ] 
+       
+},
+// new 
   {
     cat:"Story & fit",
     q:"Walk me through your current project.",
