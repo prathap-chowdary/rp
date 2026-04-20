@@ -79,9 +79,11 @@
   .q-body { display: none; margin-top: 14px; padding-top: 14px; border-top: 0.5px solid var(--border); }
  .q-card.open .q-body { display: block; }
 
-  .answer { font-size: 13px; margin-bottom: 10px; }
+  .answer { font-size: 13px; margin-bottom: 10px; color :#F5E8D8
+
+}
 
   .node { margin-left: 15px; margin-top: 6px; }
-  .node-q { cursor: pointer; font-size: 13px;  }
-  .node-a { display: none; font-size: 12px; color: #3cb371; margin-left: 10px; }
+  .node-q { cursor: pointer; font-size: 13px; color: #FF4500   }
+  .node-a { display: none; font-size: 12px; color: #F5E8D8; margin-left: 10px; }
 </style>
