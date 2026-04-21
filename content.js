@@ -75,23 +75,17 @@ children:[
   {
     cat:"Story & fit",
     q:"Walk me through your current project.",
-    answer:`"I’m currently working on a US-based healthcare client project where I handle end-to-end data pipelines processing around 30–40 GB of data daily from multiple upstream sources, including an on-premise PostgreSQL database and file-based inputs like CSV and Excel.\n
-
-The main challenge was dealing with inconsistent data formats, maintaining data quality, and enabling reliable downstream analytics. To solve this, I worked on building a scalable pipeline using Medallion Architecture.\n
-
-In the Bronze layer, I implemented incremental ingestion to efficiently bring in raw data and store it in Parquet format, while standardizing column structures across different sources.\n
-
-In the Silver layer, I focused on data quality by implementing deduplication, null handling, schema enforcement, and validation rules. This ensured only clean and consistent data moves forward. We stored this in Delta tables using a truncate-and-load approach for staging.\n
-
-In the Gold layer, I built business transformations and implemented SCD Type 2 logic using merge operations to maintain historical data. I also added audit columns like timestamps and run IDs for better traceability and debugging.\n
-
-For downstream consumption, we integrated with Snowflake using Azure Data Factory pipelines to push data incrementally. On top of Snowflake, we created optimized views used by reporting and analytics teams.\n
-
-The pipelines are orchestrated using scheduled workflows running every 4 hours.
-
-One key contribution I made was improving incremental load efficiency and strengthening data validation checks, which helped reduce data inconsistencies and improved overall pipeline reliability.
-
-Overall, this system ensures scalable, reliable, and hgh availability for critical healthcare analytics.”"`,
+    answer:`👉: I'm currently in the US healthcare domain where I build and optimize data pipelines on Azure Databricks. <br>
+    👉We follow Medallion architecture — Bronze, Silver, and Gold — to ensure clean separation between raw ingestion, transformation, and business-ready data.<br>
+    👉Our primary sources include an on-prem PostgreSQL database and file-based inputs like CSV. <br>
+        For POSTGRES we ingest that data into Databricks using JDBC-based Spark reads.<br> 
+        For files, they land on ADLS Gen2 and we pick them up from there in Databricks<br>
+    👉In the Bronze layer, we follow an incremental load pattern — we maintain a metadata table that tracks the last_processed_timestamp per table. On each run, we query only the delta records beyond that watermark, and All raw data lands in the Bronze layer in Parquet format on ADLS Gen2 — minimal transformations here, just schema alignment across sources.
+    <br>👉In the Silver layer, we apply standardization — deduplication using row-number window functions, null handling, and column renaming as per our naming conventions. The output is written as Delta tables in truncate-and-load fashion, which gives us schema enforcement and ACID guarantees while keeping Silver always in a clean, query-ready state.
+<br>👉
+In the Gold layer, we apply business logic — SCD Type 2 for dimension tables to preserve historical records, and aggregations for fact and summary tables. Gold is also written as Delta tables on ADLS Gen2.
+<br>👉From Gold, we use ADF pipelines to push data directly into Snowflake tables, where the reporting and BI teams consume it via views built on top. Separately, our data science team directly reads from the Gold Delta tables — they prefer Delta for its time-travel and versioning capabilities.<>br
+On an average, we will be processing about 30 to 40 GB data per day. The pipelines are orchestrated using scheduled workflows running every 4 hours.`,
 children:[]
   },
   {
