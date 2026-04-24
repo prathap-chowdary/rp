@@ -75,16 +75,21 @@ children:[
   {
     cat:"Project",
     q:"Walk me through your current project.",
-    answer:`👉: I'm currently in the US healthcare domain where I build and optimize data pipelines on Azure Databricks. <br>
-    👉We follow Medallion architecture — Bronze, Silver, and Gold — to ensure clean separation between raw ingestion, transformation, and business-ready data.<br>
-    👉Our primary sources include an on-prem PostgreSQL database and file-based inputs like CSV and excel. <br>
-    👉In the Bronze layer, we follow an incremental load pattern — we maintain a metadata table that tracks the last_processed_timestamp per table. On each run, we query only the delta records beyond that watermark, and All raw data lands in the Bronze layer in Parquet format on ADLS Gen2 — minimal transformations here, just schema alignment across sources.
-    <br>👉In the Silver layer, we apply standardization — deduplication using row-number window functions, null handling, and column renaming as per our naming conventions. The output is written as Delta tables in truncate-and-load fashion, which gives us schema enforcement and ACID guarantees while keeping Silver always in a clean, query-ready state.
-<br>👉
-In the Gold layer, we apply business logic — SCD Type 2 for dimension tables to preserve historical records, and aggregations for fact and summary tables. Gold is also written as Delta tables.
-<br>👉From the Gold layer, the curated and business-ready data is exposed to downstream teams. Reporting and BI teams consume it through views created on the gold tables, while the data science team directly works on Gold Delta tables due to benefits like time-travel and versioning.<br>
-👉The pipelines are scheduled and orchestrated using Databricks workflows, processing around 45–50 GB of data daily`,
-children:[
+    answer:`<li> I'm currently in the US healthcare domain where I build and optimize data pipelines on Azure Databricks.</li>
+    <li>We follow Medallion architecture — Bronze, Silver, and Gold — to ensure clean separation between raw ingestion, transformation, and business-ready data.</li>
+    <li>Our primary sources include an on-prem PostgreSQL database and file-based inputs like CSV and excel. </li>
+    <li>In the Bronze layer, we follow an incremental load pattern — we maintain a metadata table that tracks the last_processed_timestamp per table. On each run, we query only the delta records beyond that watermark, and All raw data lands in the Bronze layer in Parquet format on ADLS Gen2 — minimal transformations here, just schema alignment across sources.</li>
+   <ul><li>In the silver layer We pick up today's incremental records from Bronze, apply transformations, truncate Silver, and reload it — making every run idempotent.</li>
+   <li>For transformations, we do three things: deduplication using ROW_NUMBER() partitioned by the business key and ordered by updated_at descending to retain only the latest version of each record, null handling where we drop nulls on critical columns and default-fill the rest, and normalization to standardize data types, date formats, and column casing across sources.</li>
+   <li>Silver Data is stored in Delta format to ensure consistency and support downstream transformations</li>
+   </ul>
+   <ul><li>Gold is where business logic lives. For dimension tables, we implement SCD Type 2 using MERGE — inserting new records and closing out old ones with an end date and active flag, so we preserve the full history of how an entity changed over time.</li> <li>For fact tabbles, we apply aggregations aligned to reporting requirements.</li>
+<li>All Gold tables are stored in Delta format.</li></ul>
+	<li>BI and reporting teams consume Gold through views built on top of Delta tables, giving them a clean, always-current interface without touching raw tables. </li>
+	<li>Data science teams work directly on the Delta tables, primarily because they need time travel — querying specific historical versions for model training</li>
+	<li>The entire pipeline — Bronze to Silver to Gold — is orchestrated through Databricks Workflows, running on a scheduled cadence and processing around 45–50 GB daily end to end</li>`
+
+,children:[
 {
 	q:`High Level`,
 	a:``,
