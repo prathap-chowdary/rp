@@ -1,4 +1,4 @@
-const cats = ["All","Story & fit","Technical depth","Salary & logistics","Mindset & growth"];
+const cats = ["All","Story & fit","Technical depth","Salary & logistics","Mindset & growth","Project"];
 const qs = [
 {
     cat:"Story & fit",
@@ -73,21 +73,137 @@ children:[
 },
 // new 
   {
-    cat:"Story & fit",
+    cat:"Project",
     q:"Walk me through your current project.",
     answer:`👉: I'm currently in the US healthcare domain where I build and optimize data pipelines on Azure Databricks. <br>
     👉We follow Medallion architecture — Bronze, Silver, and Gold — to ensure clean separation between raw ingestion, transformation, and business-ready data.<br>
-    👉Our primary sources include an on-prem PostgreSQL database and file-based inputs like CSV. <br>
-        For POSTGRES we ingest that data into Databricks using JDBC-based Spark reads.<br> 
-        For files, they land on ADLS Gen2 and we pick them up from there in Databricks<br>
+    👉Our primary sources include an on-prem PostgreSQL database and file-based inputs like CSV and excel. <br>
     👉In the Bronze layer, we follow an incremental load pattern — we maintain a metadata table that tracks the last_processed_timestamp per table. On each run, we query only the delta records beyond that watermark, and All raw data lands in the Bronze layer in Parquet format on ADLS Gen2 — minimal transformations here, just schema alignment across sources.
     <br>👉In the Silver layer, we apply standardization — deduplication using row-number window functions, null handling, and column renaming as per our naming conventions. The output is written as Delta tables in truncate-and-load fashion, which gives us schema enforcement and ACID guarantees while keeping Silver always in a clean, query-ready state.
 <br>👉
-In the Gold layer, we apply business logic — SCD Type 2 for dimension tables to preserve historical records, and aggregations for fact and summary tables. Gold is also written as Delta tables on ADLS Gen2.
-<br>👉From Gold, we use ADF pipelines to push data directly into Snowflake tables, where the reporting and BI teams consume it via views built on top. Separately, our data science team directly reads from the Gold Delta tables — they prefer Delta for its time-travel and versioning capabilities.<>br
-On an average, we will be processing about 30 to 40 GB data per day. The pipelines are orchestrated using scheduled workflows running every 4 hours.`,
-children:[]
+In the Gold layer, we apply business logic — SCD Type 2 for dimension tables to preserve historical records, and aggregations for fact and summary tables. Gold is also written as Delta tables.
+<br>👉From the Gold layer, the curated and business-ready data is exposed to downstream teams. Reporting and BI teams consume it through views created on the gold tables, while the data science team directly works on Gold Delta tables due to benefits like time-travel and versioning.<br>
+👉The pipelines are scheduled and orchestrated using Databricks workflows, processing around 45–50 GB of data daily`,
+children:[
+{
+	q:`High Level`,
+	a:``,
+	children:[
+			{ q:`Why medallion `,
+					a:` <ul>
+  		<li>In our project, Medallion architecture helped solve data inconsistency and reprocessing issues from multiple sources (PostgreSQL + files).
+    		<ul>
+      			<li>Bronze stores raw data as-is from source→ so you always have a replayable source of truth if anything breaks downstream.</li>
+      			<li>Silver ensures standardized, deduplicated datasets, avoiding repeated cleaning logic across teams</li>
+      			<li>Gold provides business-ready, aggregated datasets, so BI and DS teams don’t implement their own transformations</li>
+    		</ul>
+  		</li><li>Without medallion, debugging and root-cause tracing were difficult, and reprocessing required repeatedly hitting source systems, increasing cost and risk.</li></ul>`,
+			children:[],
+			} ,
+			
+
+			{q:`Why Databricks for just 45–50 GB/day, not rdbms or Snowflake ingestion`,
+			 a:` 👉Current volume is moderate, but we chose Databricks for scalability, complex transformations like SCD2, and Delta features like MERGE and time travel.
+			It’s more about future growth and flexibility than just current size.<br>
+			👉If migrated now : At current scale, a traditional system could work but slow due to scd2+ complex joins, but Databricks gives us better flexibility and future 				scalability. `,
+			 children:[] ,
+			},
+			{
+			q:`On premis sql - How pulling - What’s the failure handling mechanism?`,
+			a:` <li> We ingest data from on-prem PostgreSQL using JDBC-based Spark reads via Databricks.</li>
+				<li>We use partitioned JDBC reads (based on numeric columns like ID) to parallelize extraction and improve performance.If not used  everything 					through a single executor. </li>
+				<li>We have retry logic (3 attempts) for transient failures like network issues.
+				</li> <li>The pipelines are orchestrated via Databricks Workflows.</li> 
+					<pre><code class="language-python">url = "jdbc:postgresql://host:port/db"
+properties = {
+    "user": "username",
+    "password": "password",
+    "driver": "org.postgresql.Driver"
+}
+query = "(SELECT * FROM schema.table WHERE updated_at > '2025-01-01') as t"
+retries = 3
+for i in range(retries):
+    try:
+        df = spark.read.jdbc(
+            url=url,
+            table=query,
+            properties=properties
+        ).option("partitionColumn", "id")
+         .option("lowerBound", "1")
+         .option("upperBound", "100000")
+         .option("numPartitions", "8")
+         .load()
+ 
+        break
+    except Exception as e:
+        if i == retries - 1:
+            raise e</code></pre>`,
+			children:[],
+			},
+		],
+},
+///new
+
+{
+q:`Bronze Layer`,
+	a:``,
+	children:[
+		{
+		q:`How do you ensure atomicity between data load + watermark update? and how it loads`,
+		a:`<li>Metadata table (stored as Delta) tracks last_processed_timestamp.</li><li>We update it only after successful data write to Bronze.</li><li>This ensures if pipeline fails mid-way, watermark is not updated → so data is reprocessed safely.</li>`,children:[],
+},
+		{
+		q:`Why Parquet in Bronze, not Delta?`,
+		a:`<li>Bronze is meant to store raw, immutable data, so we use Parquet to keep it simple and cost-efficient.
+</li><li>We avoid Delta here since we don’t need updates or ACID — just raw ingestion.
+</li><li>Delta is used from Silver onwards where we need MERGE, updates, and consistency.</li>`,children:[],
+},
+ 
+
+//////////////////////////
+
+{ q:`Late arriving data`,
+a:`<li>Currently, we rely on source data contracts, so we don’t have a dedicated late-data handling mechanism.</li>
+	<li>I’m aware this is a limitation, since timestamp-based incremental loads can miss late-arriving records.</li>
+	<li>A better approach would be implementing a lookback window or CDC-based ingestion to handle such scenarios more reliably.</li>`
+,children:[
+{q:`how look back windows are decided`,
+	a:`<li>Lookback window is decided based on data arrival patterns and business SLAs.</li><li>We analyze how late data typically arrives (e.g., 1–2 days delay), and set the window 	slightly higher (like 2–3 days) to be safe.</li>`
+,children:[],
+},],},],},
+//////////////////////////////////
+
+
+//new
+{q:`Silver Layer`,
+	a:``,
+	children:[
+		{
+		q:`How do you ensure atomicity between data load + watermark update? and how it loads`,
+		a:`<li></li><li></li><li></li>`,children:[],
+		},
+]
+ },
+///new
+{q:`Gold Layer`,
+	a:``,
+	children:[{	
+		q:`How do you ensure atomicity between data load + watermark update? and how it loads`,
+		a:`<li></li><li></li><li></li>`,children:[],
+},]
+},
+///new
+{q:`🔥 Performance & Optimization (this is where your “40–45%” claim gets tested)`,
+	a:``,
+	children:[]
+},
+{q:`🔥 Architecture & Reality Check`,
+	a:``,
+	children:[]
+}
+],
   },
+//////////___________________new //////////////////////////
   {
     cat:"Story & fit",
     q:"What's your biggest technical achievement so far?",
