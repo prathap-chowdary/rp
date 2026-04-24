@@ -39,7 +39,31 @@
       --danger-border: #7f1d1d;
     }
   }
+ul {
+  list-style: none;
+  padding-left: 20px;
+}
 
+ul li::before {
+  content: "●";
+  color: white;
+  font-size: 8px;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+ul ul {
+  padding-left: 20px;
+  margin-top: 6px;
+}
+
+ul ul li::before {
+  content: "○";
+  color: white;
+  font-size: 8px;
+  margin-right: 8px;
+  vertical-align: middle;
+}
   body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     background: var(--bg);
