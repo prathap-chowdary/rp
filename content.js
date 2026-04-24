@@ -75,21 +75,33 @@ children:[
   {
     cat:"Project",
     q:"Walk me through your current project.",
-    answer:`<li> I'm currently in the US healthcare domain where I build and optimize data pipelines on Azure Databricks.</li>
-    <li>We follow Medallion architecture — Bronze, Silver, and Gold — to ensure clean separation between raw ingestion, transformation, and business-ready data.</li>
-    <li>Our primary sources include an on-prem PostgreSQL database and file-based inputs like CSV and excel. </li>
-    <li>In the Bronze layer, we follow an incremental load pattern — we maintain a metadata table that tracks the last_processed_timestamp per table. On each run, we query only the delta records beyond that watermark, and All raw data lands in the Bronze layer in Parquet format on ADLS Gen2 — minimal transformations here, just schema alignment across sources.</li>
-   <ul><li>In the silver layer We pick up today's incremental records from Bronze, apply transformations, truncate Silver, and reload it — making every run idempotent.</li>
-   <li>For transformations, we do three things: deduplication using ROW_NUMBER() partitioned by the business key and ordered by updated_at descending to retain only the latest version of each record, null handling where we drop nulls on critical columns and default-fill the rest, and normalization to standardize data types, date formats, and column casing across sources.</li>
-   <li>Silver Data is stored in Delta format to ensure consistency and support downstream transformations</li>
-   </ul>
-   <ul><li>Gold is where business logic lives. For dimension tables, we implement SCD Type 2 using MERGE — inserting new records and closing out old ones with an end date and active flag, so we preserve the full history of how an entity changed over time.</li> <li>For fact tabbles, we apply aggregations aligned to reporting requirements.</li>
-<li>All Gold tables are stored in Delta format.</li></ul>
-	<li>BI and reporting teams consume Gold through views built on top of Delta tables, giving them a clean, always-current interface without touching raw tables. </li>
-	<li>Data science teams work directly on the Delta tables, primarily because they need time travel — querying specific historical versions for model training</li>
-	<li>The entire pipeline — Bronze to Silver to Gold — is orchestrated through Databricks Workflows, running on a scheduled cadence and processing around 45–50 GB daily end to end</li>`
-
-,children:[
+   answer: `
+<ul>
+  <li>I'm currently in the US healthcare domain where I build and optimize data pipelines on Azure Databricks.</li>
+  <li>We follow Medallion architecture — Bronze, Silver, and Gold — to ensure clean separation between raw ingestion, transformation, and business-ready data.</li>
+  <li>Our primary sources include an on-prem PostgreSQL database and file-based inputs like CSV and Excel.</li>
+  <li>In the Bronze layer, we follow an incremental load pattern — we maintain a metadata table that tracks the last_processed_timestamp per table. On each run, we query only the delta records beyond that watermark. All raw data lands in Bronze in Parquet format on ADLS Gen2 — minimal transformations here, just schema alignment across sources.</li>
+  <li>In the Silver layer, we pick up today's incremental records from Bronze, apply transformations, truncate Silver, and reload it — making every run idempotent.
+    <ul>
+      <li>Deduplication using ROW_NUMBER() partitioned by business key, ordered by updated_at descending.</li>
+      <li>Null handling — drop on critical columns, default-fill on non-critical.</li>
+      <li>Normalization — standardizing data types, date formats, and column casing across sources.</li>
+      <li>Silver is stored in Delta format for consistency and downstream support.</li>
+    </ul>
+  </li>
+  <li>In the Gold layer, business logic lives here.
+    <ul>
+      <li>Dimension tables use SCD Type 2 via MERGE — closing old records with end date and active flag, inserting new versions.</li>
+      <li>Fact tables are upserted first via MERGE, then aggregations are run on top for summary tables.</li>
+      <li>All Gold tables are stored in Delta format.</li>
+    </ul>
+  </li>
+  <li>BI and reporting teams consume Gold through views built on top of Delta tables — clean, always-current interface without touching raw tables.</li>
+  <li>Data science teams work directly on Delta tables for time travel — querying historical versions for model training.</li>
+  <li>The entire pipeline is orchestrated through Databricks Workflows, processing around 45–50 GB daily end to end.</li>
+</ul>
+`,
+children:[
 {
 	q:`High Level`,
 	a:``,
