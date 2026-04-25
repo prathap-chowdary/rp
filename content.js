@@ -196,8 +196,8 @@ a:`<li>Currently, we rely on source data contracts, so we don’t have a dedicat
 	a:``,
 	children:[
 		{
-		q:`How do you ensure atomicity between data load + watermark update? and how it loads`,
-		a:`<li></li><li></li><li></li>`,children:[],
+		q:`How do you handle schema changes from source?`,
+		a:`Delta format gives us schema enforcement at write time, so unexpected schema changes fail loudly rather than silently corrupting Silver. We handle schema evolution explicitly when needed using mergeSchema.`,children:[],
 		},
 ]
  },
@@ -205,9 +205,81 @@ a:`<li>Currently, we rely on source data contracts, so we don’t have a dedicat
 {q:`Gold Layer`,
 	a:``,
 	children:[{	
-		q:`How do you ensure atomicity between data load + watermark update? and how it loads`,
-		a:`<li></li><li></li><li></li>`,children:[],
-},]
+		q:`why upsert fact tables before aggregating?`,
+		a:`Aggregating before upsert risks including stale or duplicate records in the summary. We upsert first so the fact table is in its correct final state, then aggregate — ensuring summary tables always reflect accurate numbers`,children:[],
+},
+{
+q:`How does your SCD Type 2 MERGE work?`,
+a:`We implemented SCD Type 2 in the Gold layer using Delta Lake MERGE on business key and active flag. If a match is found and tracked columns change, we expire the existing record by setting is_active = false and updating end_date. New records are inserted directly. <br>
+For changed records, we insert a new active version in a second step by identifying records closed in the current run, ensuring full history with continuous business key.<br>
+
+
+<pre><code class="language-sql">
+
+
+MERGE INTO gold.dim_patient AS tgt
+USING incoming AS src
+ON tgt.patient_id = src.patient_id -- Business Keys
+AND tgt.is_active = true
+
+-- Match found + at least one tracked column changed → close it
+WHEN MATCHED AND (
+    tgt.name           <> src.name           OR
+    tgt.dob            <> src.dob            OR ........
+)
+THEN UPDATE SET
+    tgt.is_active  = false,
+    tgt.end_date   = current_date(),
+    tgt.updated_at = current_timestamp()
+
+-- No match → brand new record, straight insert
+WHEN NOT MATCHED THEN INSERT (
+    patient_id,
+    name,
+    start_date,
+    end_date,
+    is_active,
+    updated_at
+)
+VALUES (
+    src.patient_id,
+    src.name,
+    current_date(),
+    NULL,
+    true,
+    current_timestamp()
+);
+
+
+INSERT INTO gold.dim_patient (
+    patient_id,
+    start_date,
+    end_date,
+    is_active,
+    updated_at
+)
+SELECT
+    src.patient_id,
+    current_date()      AS start_date,
+    NULL                AS end_date,
+    true                AS is_active,
+    current_timestamp() AS updated_at
+FROM incoming src
+INNER JOIN gold.dim_patient tgt
+    ON  tgt.patient_id = src.patient_id
+    AND tgt.is_active  = false
+    AND tgt.end_date   = current_date();  -- only rows closed in THIS run
+
+
+</code></pre>`
+
+
+,children:[],
+},
+{q:`why views only for BI`,a:`Views give us a decoupling layer between the Gold tables and BI consumers. If we restructure or rename anything in the underlying table, we just update the view — BI reports stay untouched and nothing breaks downstream`,children:[]},
+{q:`what if the MERGE partially fails for fcts? Are your summary tables now inconsistent with facts`,a:`in case of a MERGE failure the aggregation part is skipped  — the agg task only triggers on success of the MERGE task. So summary tables retain yesterday's data intentionally, not silently. We'd also fire an alert so the BI team knows the data is T-1. Stale but consistent is better than partial aggregations on top of a half-written fact table.`,children:[]},
+]
+
 },
 ///new
 {q:`🔥 Performance & Optimization (this is where your “40–45%” claim gets tested)`,
@@ -216,27 +288,57 @@ a:`<li>Currently, we rely on source data contracts, so we don’t have a dedicat
 },
 {q:`🔥 Architecture & Reality Check`,
 	a:``,
-	children:[]
+	children:[
+{q:`why not ADF only dbx`, a:`Our sources — PostgreSQL via JDBC and CSV/Excel from ADLS — are natively handled in PySpark, so ADF added no value. Databricks Workflows already handles our orchestration, so bringing in ADF would've just split observability across two tools for zero gain`,children:[]
+}
+,
+]
 }
 ],
   },
 //////////___________________new //////////////////////////
-  {
-    cat:"Story & fit",
-    q:"What's your biggest technical achievement so far?",
-    answer:`"The pipeline optimization work. When I joined the project the Spark jobs were running long and there was a lot of full-reload processing. I profiled the bottlenecks, introduced dynamic partitioning, added caching for reused DataFrames, and compacted small files that were killing read performance. The result was a 40 to 45 percent reduction in runtime. It was meaningful because it didn't just make the jobs faster — it reduced infrastructure cost and improved our data availability window for the BI team."`,children:[]
-  },
+
+{
+    cat:" Scenario Based",
+   q:`Your 40-45% optimizaton story / Biggest technical achievement so far`,
+answer:`<li> One of the significant challenges I faced was around pipeline performance in the Gold layer. Gold layer is where all the heavy lifting happens — SCD Type 2 MERGEs on dimension tables, upserts on fact tables, and aggregations for summary tables on top of that.
+<li>Initially, the Gold layer jobs were running for 50-55 mins and sometimes taking much longer than expected. I opened the Spark UI and started analyzing the execution plans. A few things stood out.</li>
+<li><ul>
+<li>First, the MERGE operations on dimension and fact tables were doing full table scans — because without Z-ORDER, Delta had no way to skip irrelevant files when looking for matching keys. I applied Z-ORDER on the columns used in MERGE join conditions and common filter predicates, It clusters matching rows together physically, so MERGE reads far fewer files. Once that was in place, Delta's data skipping kicked in and the engine started skipping large portions of the table — MERGEs became significantly faster. </li>
+<li>Second, since we run MERGE every day, each run was writing new small Delta files into the Gold tables. Over time this meant aggregation queries were opening hundreds of small files instead of a few large ones. I ran OPTIMIZE periodically to compact those files, which reduced the file count Spark had to open during aggregation scans considerably. </li>
+<li>Third — and this is the one I found most impactful in the aggregation queries — we had multiple joins happening between the fact table and several dimension tables. Spark was doing SortMerge joins across all of them, which meant heavy shuffle stages. I went through each joining table and checked their sizes in the Spark UI. One of the reference dimension tables was around 20 MB — just above Spark's default auto-broadcast threshold of 10 MB, so it wasn't getting broadcasted automatically. I explicitly applied a broadcast hint on that table. That eliminated the shuffle stage for that join entirely — the small table was sent to every executor once and the join happened locally. The difference was immediately visible in the execution plan. </li></ul>
+<li>The combination of these three — Z-ORDER for data skipping on MERGEs, OPTIMIZE for file compaction on aggregations, and broadcast hint for the small dimension table joins — brought down the overall Gold layer runtime by 40–45% </li>
+</li>
+<pre><code class="language-sql">
+result_df = df_large.join(
+    broadcast(df_small),
+    on="id",
+    how="inner"
+) -- Daily in code
+
+OPTIMIZE sales_data ZORDER BY (customer_id,client_id)  -- weekly once
+VACUUM sales_data RETAIN 168 HOURS -- scheduled separately with appropriate retention to clean up obsolete files without affecting time travel.
+</code></pre>
+
+`,
+children:[],
+}, 
+{
+    cat:" Scenario Based",
+   q:`Challenges faced and overcome`,
+answer:`<li> One challenge we faced was schema changes from the Upstream PostgreSQL source, like new columns being added without notice, which used to break our Bronze-to-Silver pipelines.. Since Bronze was stored in Parquet, these columns were ingested without failure but led to schema drift. In Silver, we explicitly select required columns instead of using select *, so pipelines remain stable. We also detect new columns by comparing schemas during ingestion and trigger alert notifications, allowing us to review and onboard them in a controlled manner.</li>
+<li>While reading Excel files from Unity Catalog Volumes, Spark initially threw a File Not Found error. After validating the path and volume access permissions, I realized the issue was actually due to Spark not having a native Excel reader.<br>
+
+By default, Spark supports formats like Parquet, CSV, and JSON, but not Excel. So even though the file existed, Spark couldn't interpret it correctly. <br>
+
+To resolve this, I added the external library com.crealytics:spark-excel_2.12:0.13.5 to the cluster. After that, I was able to successfully read the file using the custom format.</li>`,
+children:[],
+},  
   {
     cat:"Technical depth",
     q:"What Azure and Databricks tools do you use daily?",
     answer:`"Day to day: Databricks for compute and notebook-based pipeline development, PySpark for distributed transformations, Delta Lake for the storage layer, ADLS Gen2 for raw and processed data storage, and Azure Data Factory for orchestration and triggering pipelines. Git for version control across the team. I use SQL heavily inside Databricks for the Gold-layer aggregations."`,children:[]
  
-  },
-  {
-    cat:"Technical depth",
-    q:"Can you explain Medallion architecture in plain terms?",
-    answer:`"It's a layered approach to organizing data in a lakehouse. Bronze is the raw landing zone — data arrives exactly as the source sent it, no transformations, just durability. Silver is where you clean, validate, join, and conform the data — it's the trusted, queryable layer. Gold is business-level aggregates and domain models that BI tools and analysts consume directly. The big benefit is clear lineage, easy debugging — if something's wrong in Gold you trace it back through Silver to Bronze — and separating storage concerns from compute."`,
- children:[]  
   },
   {
     cat:"Technical depth",
@@ -247,40 +349,9 @@ a:`<li>Currently, we rely on source data contracts, so we don’t have a dedicat
   },
   {
     cat:"Technical depth",
-    q:"How do you handle incremental data loads?",
-    answer:`"I use Delta Lake MERGE statements combined with a watermark pattern. Typically I track a high-water mark column — like a last_modified timestamp — to pull only changed or new records from the source. Then I MERGE them into the target Delta table: update if the key exists, insert if it's new. For some tables I also use CDC patterns depending on what the source system supports. The goal is always to avoid full reloads — at 45 to 50 GB per day, full reloads aren't cost-effective or time-efficient."`,
- children:[]  
-  },
-  {
-    cat:"Technical depth",
     q:"How did you optimize Spark job performance?",
     answer:`"A few different levers. First, partitioning — partitioning data by a high-cardinality date or region column reduces the shuffle and limits how much each task reads. Second, caching — any DataFrame that gets reused in the same pipeline I persist to memory rather than recomputing it. Third, file compaction — small files are a major Spark performance killer, so I run OPTIMIZE on Delta tables regularly to consolidate them. Z-ORDER on top of that clusters physically related data to cut read I/O. Combined, these brought our job runtimes down 40 to 45 percent."`,
  children:[]  
-  },
-  {
-    cat:"Salary & logistics",
-    q:"What's your current CTC and what are your expectations?",
-    answer:`Research the market rate before the call. For a Databricks / Azure Data Engineer with 2–3 years in Hyderabad, the range in 2025–2026 is roughly ₹8–14 LPA depending on company size. Give a range, not a single number. Example: "I'm currently at X. Based on my research and the scope of this role, I'm targeting somewhere in the Y to Z range — but I'm open to discussing the full compensation picture."`,
- children:[]  
-  },
-  {
-    cat:"Salary & logistics",
-    q:"What's your notice period?",
-    answer:`"My official notice period is [your actual period — typically 60–90 days at TCS]. I'd want to ensure a proper handover of my pipelines, but I'm open to discussing early joining if the situation allows."`,
- children:[]  
-  },
-  {
-    cat:"Salary & logistics",
-    q:"Are you open to relocation / hybrid / remote?",
-    answer:`Answer honestly based on your actual preference. Just be specific — "I'm open to hybrid in Hyderabad or Bangalore" is more useful to a recruiter than "I'm flexible."`,
- children:[]  
-  },
-  {
-    cat:"Mindset & growth",
-    q:"You have under 3 years of experience — how do you position yourself for senior roles?",
-    answer:`"I'd position it differently — I have under 3 years of time, but I have production experience at scale. I've optimized pipelines processing 45 to 50 GB per day, designed full Medallion architectures, and I hold both Databricks certifications — Associate and Professional. The Professional certification in particular is not a beginner credential. I'm not claiming to have a decade of architecture experience, but I'm technically deeper than my tenure suggests."`,
- children:[]  
- 
   },
   {
     cat:"Mindset & growth",
