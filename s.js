@@ -35,6 +35,8 @@ function render() {
       </div>
       <div class="q-body">
         <div class="answer">${q.answer}</div>
+	<div class="tip-box">${q.tip}</div>
+	
         ${renderNodes(q.children, idx)}
       </div>
     </div>`;
