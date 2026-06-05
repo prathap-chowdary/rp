@@ -82,7 +82,25 @@ children:[
 q:`have you ever worked on any end-end data Frame work ?`,
 answer:`"Yes, I've worked on an end-to-end data pipeline built on Azure Databricks. We follow Medallion architecture — starting from raw ingestion in Bronze, transformation and deduplication in Silver, and business-ready aggregations and SCD Type 2 dimensions in Gold. The entire pipeline is orchestrated through Databricks Workflows, processing around 45–50 GB of healthcare data daily. From source to BI consumption — that's our end-to-end framework." `,
 tip:`end-end data pipe line = end-end data framework `,
+children:[{
+q: `"Can you tell me more about the domains of the projects that you have worked with?"`,
+a:`I have primarily worked in the Healthcare domain for a US-based client. The project deals with healthcare claims data. We receive data from multiple upstream systems containing member information, provider details, claim transactions, diagnosis codes, and payment information.
+
+My role is to build and maintain Databricks-based ETL pipelines that ingest data from PostgreSQL and file-based sources, transform it, and make it available for downstream reporting, analytics, and data science teams.`,
+children:[
+{
+			q:`"You said healthcare claims. What are the top 5 datasets you process?"`,
+			a:`The major datasets include member information, provider information, claim transaction data, payment-related data, and some reference/master datasets used for validations and mappings.`,
+			children: [],
+			},
+{
+q:`"How did your project handle HIPAA compliance?"`,
+a:`We handled healthcare data containing PHI, so access was controlled through role-based permissions. Sensitive fields were encrypted, audit logs were maintained, and only authorized users could access patient-level data. For reporting and analytics, we often used de-identified or masked datasets whenever possible.`,
 children:[],
+},
+
+],},
+]
 },
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// new 
 
@@ -367,6 +385,24 @@ children:[],
  
   },
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// new 
+
+  {
+    cat:"Technical depth",
+    q:"What is Delta Lake and why does it matter?",
+    answer:`"Delta Lake is an open-source storage layer that brings ACID transactions to your data lake. Without it, a data lake is just files — no guarantees around consistency if a write fails halfway. With Delta Lake you get reliable MERGE and upsert operations, schema enforcement, schema evolution when your source data changes, and Time Travel which lets you query historical versions of a table. In practice it means I can build incremental pipelines that are safe to rerun without duplicating data, which is critical in healthcare where data accuracy matters."`,
+ children:[]  
+  
+  },
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// new 
+
+  {
+    cat:"Technical depth",
+    q:"How did you optimize Spark job performance?",
+    answer:`"A few different levers. First, partitioning — partitioning data by a high-cardinality date or region column reduces the shuffle and limits how much each task reads. Second, caching — any DataFrame that gets reused in the same pipeline I persist to memory rather than recomputing it. Third, file compaction — small files are a major Spark performance killer, so I run OPTIMIZE on Delta tables regularly to consolidate them. Z-ORDER on top of that clusters physically related data to cut read I/O. Combined, these brought our job runtimes down 40 to 45 percent."`,
+ children:[]  
+  },
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// new 
+
   {
     cat:"Mindset & growth",
     q:"What are you looking to learn or work on next?",
