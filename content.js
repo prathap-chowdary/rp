@@ -96,7 +96,7 @@ children:[
 			},
 {
 q:`"How did your project handle HIPAA compliance?"`,
-a:`We handled healthcare data containing PHI, so access was controlled through role-based permissions. Sensitive fields were encrypted, audit logs were maintained, and only authorized users could access patient-level data. For reporting and analytics, we often used de-identified or masked datasets whenever possible.`,
+a:`Since we were handling healthcare claims data containing PHI, compliance was built into every layer of the pipeline. In Databricks, we used Unity Catalog to enforce role-based access — sensitive fields like member name, date of birth, and SSN had column-level masking applied, so only authorized roles could see unmasked values. Row-level security on Gold tables ensured downstream teams only accessed data within their scope. We never logged PHI in pipeline logs — any debugging used surrogate keys like member_id instead of actual patient identifiers. Audit logs were enabled in Unity Catalog to track who accessed what and when. For reporting and analytics, we served de-identified or masked datasets wherever PHI wasn't needed.`,
 children:[],
 },
 
