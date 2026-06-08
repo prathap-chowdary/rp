@@ -13,10 +13,10 @@ const qs = [
     </span> 
 </p>
 <p> Azure related: 
- <button onclick="navigator.clipboard.writeText(document.getElementById('copyLine').innerText)">
+ <button onclick="navigator.clipboard.writeText(document.getElementById('copyLine2').innerText)">
         📋 Copy
     </button>
-	 <span id="copyLine">
+	 <span id="copyLine2">
       https://prathap-chowdary.github.io/int-prep/azure/d.html 
     </span>`,
 		children:[],
