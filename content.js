@@ -4,13 +4,13 @@ const qs = [
 	{
 		cat:"Story & fit",
 		q:"Relted links",
-		answer:`<p>  <a href="https://prathap-chowdary.github.io/int-prep/healthcare-notes.html" target="_blank" class="link">
+		answer:`<p>  <a href="https://undefeatable171.github.io/int-prep/healthcare-notes.html" target="_blank" class="link">
     Health care
 </a></p> <br>
-<p><a href="https://prathap-chowdary.github.io/int-prep/azure/d.html" target="_blank" class="link">
+<p><a href="https://undefeatable.github.io/int-prep/azure/d.html" target="_blank" class="link">
     Azure services  related </a></p>
 	<br>
-	<p><a href="https://prathap-chowdary.github.io/int-prep/dbx/content.html" target="_blank" class="link">
+	<p><a href="https://undefeatable171.github.io/int-prep/dbx/content.html" target="_blank" class="link">
     DBX & SPARK related </a></p>`,
 		children:[],
 	},
