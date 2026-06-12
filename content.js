@@ -11,7 +11,10 @@ const qs = [
     Azure services  related </a></p>
 	<br>
 	<p><a href="https://undefeatable171.github.io/int-prep/dbx/content.html" target="_blank" class="link">
-    DBX & SPARK related </a></p>`,
+    DBX & SPARK related </a></p>
+	<br>
+	<p><a href="https://undefeatable171.github.io/int-prep/git_notes.md" target="_blank" class="link">
+    git notes </a></p>`,
 		children:[],
 	},
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
